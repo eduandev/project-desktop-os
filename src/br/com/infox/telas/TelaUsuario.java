@@ -40,10 +40,7 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
             } 
             else {
                 JOptionPane.showMessageDialog(null, "Usuário não cadastrado!");
-                txtUsuarioNome.setText(null);
-                txtUsuarioFone.setText(null);
-                txtUsuarioLogin.setText(null);
-                txtUsuarioSenha.setText(null);
+                 limpar();
             }
         } 
         catch (Exception e) {
@@ -72,10 +69,7 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
                         int adicionado = pst.executeUpdate(); 
                         if(adicionado > 0) {
                             JOptionPane.showMessageDialog(null, "Usuário cadastrado com sucesso!");
-                            txtUsuarioNome.setText(null);
-                            txtUsuarioFone.setText(null);
-                            txtUsuarioLogin.setText(null);
-                            txtUsuarioSenha.setText(null);
+                           limpar();
                         }
                     }
                 } 
@@ -83,6 +77,64 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
                     JOptionPane.showMessageDialog(null, e);
                 }
     }
+    
+    private void atualizar() {
+        String sql = "update tbusuarios set usuario=?,fone=?, login=?,senha=?,perfil=? where iduser=?";
+        try {
+            pst = conexao.prepareStatement(sql);
+
+            pst.setString(1, txtUsuarioNome.getText());
+            pst.setString(2, txtUsuarioFone.getText());
+            pst.setString(3, txtUsuarioLogin.getText());
+            pst.setString(4, txtUsuarioSenha.getText());
+            pst.setString(5, cboUsuarioPerfil.getSelectedItem().toString());
+            pst.setString(6, txtUsuarioId.getText());
+                    
+                    if (txtUsuarioId.getText().isEmpty() || txtUsuarioNome.getText().isEmpty() || txtUsuarioLogin.getText().isEmpty()
+                        || txtUsuarioSenha.getText().isEmpty() || cboUsuarioPerfil.getSelectedItem().toString().isEmpty()) { 
+                            JOptionPane.showMessageDialog(null, "Os campos com asterisco são obrigatórios!");   
+                    }
+                    else {
+                        int atualizar = pst.executeUpdate(); 
+                        if(atualizar > 0) {
+                            JOptionPane.showMessageDialog(null, "Usuário atualizado com sucesso!");
+                            limpar();
+                        }
+                    }        
+        } 
+        catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    
+    }
+    
+    private void remover() {
+        int deletar = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja remover este usuário?", "Atenção", JOptionPane.YES_NO_OPTION);
+       
+        if(deletar == JOptionPane.YES_OPTION) {
+            String sql = "delete from tbusuarios where iduser=?";
+            try {
+                pst = conexao.prepareStatement(sql);
+                pst.setString(1, txtUsuarioId.getText()); 
+               int deletado = pst.executeUpdate();
+               if(deletado == 1) {
+                    JOptionPane.showMessageDialog(null, "Usuário removido com sucesso!");
+                    limpar();
+               }
+            } 
+            catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+            }
+        }
+    }
+    
+    private void limpar() {
+        txtUsuarioNome.setText(null);
+        txtUsuarioFone.setText(null);
+        txtUsuarioLogin.setText(null);
+        txtUsuarioSenha.setText(null);    
+    }
+      
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -172,6 +224,11 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
         btnUsuarioCreate.setToolTipText("Adicionar");
         btnUsuarioCreate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnUsuarioCreate.setPreferredSize(new java.awt.Dimension(80, 80));
+        btnUsuarioCreate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUsuarioCreateActionPerformed(evt);
+            }
+        });
 
         btnUsuarioRead.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/infox/icones/read.png"))); // NOI18N
         btnUsuarioRead.setToolTipText("Consultar");
@@ -187,11 +244,21 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
         btnUsuarioDelete.setToolTipText("Deletar");
         btnUsuarioDelete.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnUsuarioDelete.setPreferredSize(new java.awt.Dimension(80, 80));
+        btnUsuarioDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUsuarioDeleteActionPerformed(evt);
+            }
+        });
 
         btnUsuarioUpdate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/infox/icones/update.png"))); // NOI18N
         btnUsuarioUpdate.setToolTipText("Atualizar");
         btnUsuarioUpdate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnUsuarioUpdate.setPreferredSize(new java.awt.Dimension(80, 80));
+        btnUsuarioUpdate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUsuarioUpdateActionPerformed(evt);
+            }
+        });
 
         jLabel7.setText("* Campos obrigatórios");
 
@@ -284,6 +351,8 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
                 .addGap(59, 59, 59))
         );
 
+        btnUsuarioDelete.getAccessibleContext().setAccessibleDescription("Remover");
+
         setBounds(0, 0, 640, 480);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -310,6 +379,18 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
     private void btnUsuarioReadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsuarioReadActionPerformed
          consultar();
     }//GEN-LAST:event_btnUsuarioReadActionPerformed
+
+    private void btnUsuarioCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsuarioCreateActionPerformed
+         adicionar();
+    }//GEN-LAST:event_btnUsuarioCreateActionPerformed
+
+    private void btnUsuarioUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsuarioUpdateActionPerformed
+        atualizar();
+    }//GEN-LAST:event_btnUsuarioUpdateActionPerformed
+
+    private void btnUsuarioDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsuarioDeleteActionPerformed
+        remover();
+    }//GEN-LAST:event_btnUsuarioDeleteActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
